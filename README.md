@@ -8,7 +8,7 @@ brainfuck-go 는 Go 로 작성 된 Brainfuck 언어의 인터프리터입니다.
 ```
 go build ./cli/bf.go
 ```
-### Excute
+### Execute
 ```
 ./bf filename
 ```
