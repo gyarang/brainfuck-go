@@ -23,3 +23,6 @@ Hello, Brainfuck-Go
 ## 통과 현황
 - [x] [Beer.b](https://github.com/rdebath/Brainfuck/blob/master/testing/Beer.b)
 - [x] [Bench.b](https://github.com/rdebath/Brainfuck/blob/master/testing/Bench.b)
+
+## TODO:
+- [ ] 테스트 한번에 돌리는 스크립트 작성...
