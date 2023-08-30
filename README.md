@@ -15,6 +15,6 @@ go build ./cli/bf.go
 
 ## Example
 ```
-./bf ./hello.bf                                                                                                                                                                                                                                                                       00:23:44
+./bf ./hello.bf
 Hello, Brainfuck-Go
 ```
