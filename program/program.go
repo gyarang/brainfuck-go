@@ -33,57 +33,60 @@ func (p *Program) Compile() {
 
 func (p *Program) Execute() error {
 	memory := make([]uint8, size)
-	ptr := 0
-	loopStart := 0
+	cursor := 0
+	loopStack := LoopStack{}
 
 	reader := bufio.NewReader(os.Stdin)
 
 	for i := 0; i < len(p.tok); i++ {
 		switch p.tok[i].Type {
 		case token.NEXT:
-			if len(memory) == ptr+1 {
+			if len(memory) == cursor+1 {
 				memory = append(memory, 0)
 			}
-			ptr++
+			cursor++
 		case token.PREV:
-			if ptr == 0 {
+			if cursor == 0 {
 				return fmt.Errorf("pointer reached out of range")
 			}
-			ptr--
+			cursor--
 		case token.INCR:
-			memory[ptr]++
+			memory[cursor]++
 		case token.DECR:
-			memory[ptr]--
+			memory[cursor]--
 		case token.PRINT:
-			fmt.Printf("%c", memory[ptr])
+			fmt.Printf("%c", memory[cursor])
 		case token.READ:
 			read, _ := reader.ReadByte()
-			memory[ptr] = uint8(read)
+			memory[cursor] = uint8(read)
 		case token.LOOP_START:
-			if memory[ptr] == 0 {
-				loopStart = 0
-				for j := i + 1; j < len(memory); j++ {
-					if p.tok[j].Type == token.LOOP_END {
-						i = j + 1
+			if memory[cursor] != 0 {
+				loopStack.Push(i)
+				continue
+			}
+
+			// skip loop
+			loopStartCnt := 0
+			for j := i + 1; j < len(memory); j++ {
+				if p.tok[j].Type == token.LOOP_START {
+					loopStartCnt++
+				}
+				if p.tok[j].Type == token.LOOP_END {
+					if loopStartCnt == 0 {
+						i = j
 						break
 					}
+					loopStartCnt--
 				}
-				return fmt.Errorf("loop end not found")
-			} else {
-				loopStart = i
 			}
 		case token.LOOP_END:
-			if i == 0 {
-				return fmt.Errorf("unexpected loop end")
-			}
-			if loopStart == 0 {
+			loopStart, err := loopStack.Pop()
+			if err != nil {
 				return fmt.Errorf("unexpected loop end")
 			}
 
-			if memory[ptr] != 0 {
-				i = loopStart
-			} else {
-				loopStart = 0
+			if memory[cursor] != 0 {
+				i = loopStart - 1
 			}
 		}
 	}
